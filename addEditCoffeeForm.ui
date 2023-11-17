@@ -75,7 +75,7 @@
     <widget class="QLineEdit" name="check_text_lineedit"/>
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>ID менять нельзя. </string>
+      <string>ID менять нельзя. Введите ниже строчку с изменениями</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
