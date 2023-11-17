@@ -40,18 +40,22 @@ class AddUpdateBtn(QMainWindow):
         self.add_btn.clicked.connect(self.add_data)
         self.update_btn.clicked.connect(self.update_data)
 
+    def get_text(self, text):
+        if not text:
+            raise RuntimeError
+        text = text.split(";")
+        if len(text) != 7:
+            raise RuntimeError
+        if not text[0].isdigit() or not text[-1].isdigit() or not text[-2].isdigit():
+            raise RuntimeError
+        text[0], text[-1], text[-2] = int(text[0]), int(text[-1]), int(text[-2])
+        text = tuple(text)
+        return text
+
     def add_data(self):
         self.statusBar().showMessage("")
         try:
-            if not self.add_lineedit.text():
-                raise
-            text = self.add_lineedit.text().split(";")
-            if len(text) != 7:
-                raise
-            if not text[0].isdigit() or not text[-1].isdigit() or not text[-2].isdigit():
-                raise
-            text[0], text[-1], text[-2] = int(text[0]), int(text[-1]), int(text[-2])
-            text = tuple(text)
+            text = self.get_text(self.add_lineedit.text())
             self.parrent.cur.execute(
                 f"Insert Into coffee VALUES ({int(text[0])}, '{text[1]}', '{text[2]}', "
                 f"'{text[3]}', '{text[4]}', {int(text[5])}, {int(text[6])})")
@@ -63,7 +67,24 @@ class AddUpdateBtn(QMainWindow):
             self.statusBar().showMessage("Error")
 
     def update_data(self):
-        pass
+        self.statusBar().showMessage("")
+        try:
+            first_text = self.get_text(self.check_text_lineedit.text())
+            second_text = self.get_text(self.update_lineedit.text())
+
+            self.parrent.cur.execute(f"""Update coffee set Название_сорта = '{second_text[1]}', 
+            Степень_обжарки = '{second_text[2]}', Молотый_или_в_зернах = '{second_text[3]}', 
+            Описание_вкуса = '{second_text[4]}', Цена = {second_text[5]}, Объем_упаковки = {second_text[6]}
+            WHERE Id = {first_text[0]} and Название_сорта = '{first_text[1]}' and 
+            Степень_обжарки = '{first_text[2]}' and Молотый_или_в_зернах = '{first_text[3]}' and 
+            Описание_вкуса = '{first_text[4]}' and Цена = {first_text[5]} and Объем_упаковки = {first_text[6]}""")
+            self.parrent.cor.commit()
+            self.parrent.load_table()
+
+        except RuntimeError:
+            self.statusBar().showMessage('Некорректный ввод')
+        except Exception:  # непредвиденные ошибки при записи в бд
+            self.statusBar().showMessage("Error")
 
 
 def except_hook(cls, exception, traceback):
