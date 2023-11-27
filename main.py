@@ -42,12 +42,12 @@ class AddUpdateBtn(QMainWindow):
 
     def get_text(self, text):
         if not text:
-            raise RuntimeError
+            raise ValueError
         text = text.split(";")
         if len(text) != 7:
-            raise RuntimeError
+            raise ValueError
         if not text[0].isdigit() or not text[-1].isdigit() or not text[-2].isdigit():
-            raise RuntimeError
+            raise ValueError
         text[0], text[-1], text[-2] = int(text[0]), int(text[-1]), int(text[-2])
         text = tuple(text)
         return text
@@ -61,8 +61,8 @@ class AddUpdateBtn(QMainWindow):
                 f"'{text[3]}', '{text[4]}', {int(text[5])}, {int(text[6])})")
             self.parrent.cor.commit()
             self.parrent.load_table()
-        except RuntimeError:
-            self.statusBar().showMessage('Некорректный ввод')
+        except ValueError:
+            self.statusBar().showMessage("Некорректный ввод")
         except Exception:  # непредвиденные ошибки при записи в бд
             self.statusBar().showMessage("Error")
 
@@ -81,7 +81,7 @@ class AddUpdateBtn(QMainWindow):
             self.parrent.cor.commit()
             self.parrent.load_table()
 
-        except RuntimeError:
+        except ValueError:
             self.statusBar().showMessage('Некорректный ввод')
         except Exception:  # непредвиденные ошибки при записи в бд
             self.statusBar().showMessage("Error")
